@@ -1,121 +1,126 @@
 #include "Stack.hpp"
+#include <cstdlib>
+
+// What the stack "looks" like
+
+//      |       42      | <- head
+//      | DATATYPE::INT |
+//      |      'b'      |
+//      |      'u'      |
+//      |      't'      |
+//      |      't'      |
+//      |      '/0'     |
+//      | DATATYPE::STR |
+//      |      3.14     |
+//      | DATATYPE::FLT | <- tail
+//      |               |
+//      |               |
+//      |               |
+//      |               | <- max size
 
 namespace
 {
-    enum ListNodeType
+    enum DataType
     {
         INT = 0, FLT, STR
     };
-
-    struct ListNode
-    {
-        virtual ~ListNode() {}
-        virtual void* get_val() = 0;
-        virtual ListNode* get_next() = 0;
-        virtual ListNodeType type() = 0;
-    };
-
-    struct ListNodeInt : public ListNode
-    {
-        uint64_t val;
-        ListNode *next;
-        inline void* get_val() { return &val; }
-        inline ListNode* get_next() { return next; }
-        inline ListNodeType type() { return ListNodeType::INT; }
-    };
-
-    struct ListNodeFlt : public ListNode
-    {
-        double val;
-        ListNode *next;
-        inline void* get_val() { return &val; }
-        inline ListNode* get_next() { return next; }
-        inline ListNodeType type() { return ListNodeType::FLT; }
-    };
-
-    struct ListNodeStr : public ListNode
-    {
-        std::string val;
-        ListNode *next;
-        inline void* get_val() { return &val; }
-        inline ListNode* get_next() { return next; }
-        inline ListNodeType type() { return ListNodeType::STR; }
-    };
 };
 
-wj::Stack::Stack() : _head(nullptr)
+wj::Stack::Stack() : _head(NULL), _tail(NULL), _max_size(NULL)
 {}
 
 wj::Stack::~Stack()
 {
-    clean_stack();
+    if (_head != NULL)
+        free(_head);
 }
+
 
 void wj::Stack::push_int(uint64_t num)
 {
-    ListNodeInt *node = new ListNodeInt;
-    node->val = num;
-    node->next = nullptr;
-    _tail->next = node;
-    _tail = node;
+    // make sure there is enough room
+    while (space_left() < sizeof(uint64_t)) resize();
+
+    // copy data
+    uint64_t *tail_ptr = _tail;
+    *_tail = num;
+
+    // adjust tail
+    char *tail = (char*) _tail;
+    tail += sizeof(uint64_t);
+    _tail = (void*) tail;
+
+    // push type on for type checking
+    push_type(_tail, DataType::INT);
 }
+
 
 void wj::Stack::push_flt(double num)
 {
-    ListNodeFlt *node = new ListNodeFlt;
-    node->val = num;
-    node->next = nullptr;
-    _tail->next = node;
-    _tail = node;
+    // make sure there is enough room
+    while (space_left() < sizeof(double)) resize();
+
+    // copy data
+    double *tail_ptr = _tail;
+    *_tail = num;
+
+    // adjust tail
+    char *tail = (char*) _tail;
+    tail += sizeof(double);
+    _tail = (void*) tail;
+
+    // push type on for type checking
+    push_type(_tail, DataType::FLT);
 }
 
-void wj::Stack::push_str(const std::string str)
+
+void wj::Stack::push_str(const char *str)
 {
-    ListNodeStr *node = new ListNodeStr;
-    node->val = str;
-    node->next = nullptr;
-    _tail->next = node;
-    _tail = node;
+    // make sure there is enough room
+    int str_size = strlen(str) + 1;
+    while (space_left() < str_size) resize();
+
+    // copy data
+    char *tail_ptr = _tail;
+    strcpy(tail_ptr, str);
+
+    // adjust tail
+    char *tail = (char*) _tail;
+    tail += str_size;
+    _tail = (void*) tail;
+
+    // push type on for type checking
+    push_type(_tail, DataType::STR);
 }
+
 
 uint64_t wj::Stack::pop_int()
 {
-    uint64_t val;
-    ListNode *tail = (ListNode*) _tail;
-    if (tail->type() == ListNodeType::INT) {
-        val = tail->val;
-    } else {
-        val = 0;
-        printf("Tried to pop an int.");
-        assert(1);
-    }
-    return val;
+    return 0;
 }
+
 
 double wj::Stack::pop_flt()
 {
-    double val;
-    ListNode *tail = (ListNode*) _tail;
-    if (tail->type() == ListNodeType::FLT) {
-        val = tail->val;
-    } else {
-        val = 0;
-        printf("Tried to pop a flt.");
-        assert(1);
-    }
-    return val;
+    return 0;
 }
 
-std::string wj::Stack::pop_str()
+
+char* wj::Stack::pop_str()
 {
-    std::string val;
-    ListNode *tail = (ListNode*) _tail;
-    if (tail->type() == ListNodeType::STR) {
-        val = tail->val;
-    } else {
-        val = "";
-        printf("Tried to pop a str.");
-        assert(1);
-    }
-    return val;
+    return NULL;
+}
+
+
+int wj::Stack::space_left()
+{
+    char *max = (char*) _max_size;
+    char *curr = (char*) _tail;
+    return max - curr;
+}
+
+
+void wj::Stack::resize()
+{
+
 }
