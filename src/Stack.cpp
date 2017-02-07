@@ -1,6 +1,8 @@
 #include "Stack.hpp"
 #include <cstdlib>
 
+#define START_STACK_SIZE 1024
+
 // What the stack "looks" like
 
 //      |       42      | <- head
@@ -27,7 +29,20 @@ namespace
 };
 
 wj::Stack::Stack() : _head(NULL), _tail(NULL), _max_size(NULL)
-{}
+{
+    _head = malloc(START_STACK_SIZE);
+    if (_head == NULL)
+    {
+        printf("ERROR [Stack constructor] -> malloc returned NULL\n");
+        assert(1);
+    }
+
+    char *max = _head;
+    max += START_STACK_SIZE;
+    _max_size = max;
+
+    _tail = _head;
+}
 
 wj::Stack::~Stack()
 {
