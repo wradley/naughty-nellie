@@ -1,5 +1,6 @@
 #include "Stack.hpp"
 #include <cstdlib>
+#include <cassert>
 
 #define START_STACK_SIZE 1024
 
@@ -7,10 +8,10 @@
 
 //      |       42      | <- head
 //      | DATATYPE::INT |
-//      |      'b'      |
-//      |      'u'      |
-//      |      't'      |
-//      |      't'      |
+//      |      'l'      |
+//      |      'i'      |
+//      |      'f'      |
+//      |      'e'      |
 //      |      '/0'     |
 //      | DATATYPE::STR |
 //      |      3.14     |
@@ -19,14 +20,6 @@
 //      |               |
 //      |               |
 //      |               | <- max size
-
-namespace
-{
-    enum DataType
-    {
-        INT = 0, FLT, STR
-    };
-};
 
 wj::Stack::Stack() : _head(NULL), _tail(NULL), _max_size(NULL)
 {
@@ -37,7 +30,7 @@ wj::Stack::Stack() : _head(NULL), _tail(NULL), _max_size(NULL)
         assert(1);
     }
 
-    char *max = _head;
+    char *max = (char*) _head;
     max += START_STACK_SIZE;
     _max_size = max;
 
@@ -57,8 +50,8 @@ void wj::Stack::push_int(uint64_t num)
     while (space_left() < sizeof(uint64_t)) resize();
 
     // copy data
-    uint64_t *tail_ptr = _tail;
-    *_tail = num;
+    uint64_t *tail_ptr = (uint64_t*) _tail;
+    *tail_ptr = num;
 
     // adjust tail
     char *tail = (char*) _tail;
@@ -66,7 +59,7 @@ void wj::Stack::push_int(uint64_t num)
     _tail = (void*) tail;
 
     // push type on for type checking
-    push_type(_tail, DataType::INT);
+    push_type(DataType::INT);
 }
 
 
@@ -76,8 +69,8 @@ void wj::Stack::push_flt(double num)
     while (space_left() < sizeof(double)) resize();
 
     // copy data
-    double *tail_ptr = _tail;
-    *_tail = num;
+    double *tail_ptr = (double*) _tail;
+    *tail_ptr = num;
 
     // adjust tail
     char *tail = (char*) _tail;
@@ -85,7 +78,7 @@ void wj::Stack::push_flt(double num)
     _tail = (void*) tail;
 
     // push type on for type checking
-    push_type(_tail, DataType::FLT);
+    push_type(DataType::FLT);
 }
 
 
@@ -96,7 +89,7 @@ void wj::Stack::push_str(const char *str)
     while (space_left() < str_size) resize();
 
     // copy data
-    char *tail_ptr = _tail;
+    char *tail_ptr = (char*) _tail;
     strcpy(tail_ptr, str);
 
     // adjust tail
@@ -105,7 +98,23 @@ void wj::Stack::push_str(const char *str)
     _tail = (void*) tail;
 
     // push type on for type checking
-    push_type(_tail, DataType::STR);
+    push_type(DataType::STR);
+}
+
+
+void wj::Stack::push_type(DataType type)
+{
+    // make sure there is enough room
+    while (space_left() < sizeof(DataType)) resize();
+
+    // copy data
+    DataType *tail_ptr = (DataType*) _tail;
+    *tail_ptr = type;
+
+    // adjust tail
+    char *tail = (char*) _tail;
+    tail += sizeof(DataType);
+    _tail = (void*) tail;
 }
 
 

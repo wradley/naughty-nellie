@@ -6,6 +6,11 @@
 
 namespace wj
 {
+    enum DataType
+    {
+        INT = 0, FLT, STR
+    };
+
     class Stack
     {
     public:
@@ -33,6 +38,9 @@ namespace wj
 
         // doubles the max size of the array;
         void resize();
+
+        // Pushes a type on the stack to be used for debug info
+        void push_type(DataType type);
 
     };
 };
