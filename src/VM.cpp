@@ -7,29 +7,32 @@ wj::VM::VM()
 wj::VM::~VM()
 {}
 
-int get_command()
+namespace
 {
-    assert(1);
-    return 0;
-}
+    int get_command()
+    {
+        assert(1);
+        return 0;
+    }
 
-char* get_value()
-{
-    assert(1);
-    return 0;
-}
+    char* get_value()
+    {
+        assert(1);
+        return 0;
+    }
 
-uint64_t str_to_int(const char *str)
-{
-    assert(1);
-    return 0;
-}
+    uint64_t str_to_int(const char *str)
+    {
+        assert(1);
+        return 0;
+    }
 
-double str_to_double(const char *str)
-{
-    assert(1);
-    return 0;
-}
+    double str_to_double(const char *str)
+    {
+        assert(1);
+        return 0;
+    }
+};
 
 bool wj::VM::run(const std::string &file)
 {
