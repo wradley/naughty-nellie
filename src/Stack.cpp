@@ -44,18 +44,18 @@ wj::Stack::~Stack()
 }
 
 
-void wj::Stack::push_int(uint64_t num)
+void wj::Stack::push_int(int64_t num)
 {
     // make sure there is enough room
-    while (space_left() < sizeof(uint64_t)) resize();
+    while (space_left() < sizeof(int64_t)) resize();
 
     // copy data
-    uint64_t *tail_ptr = (uint64_t*) _tail;
+    int64_t *tail_ptr = (int64_t*) _tail;
     *tail_ptr = num;
 
     // adjust tail
     char *tail = (char*) _tail;
-    tail += sizeof(uint64_t);
+    tail += sizeof(int64_t);
     _tail = (void*) tail;
 
     // push type on for type checking
@@ -118,7 +118,7 @@ void wj::Stack::push_type(DataType type)
 }
 
 
-uint64_t wj::Stack::pop_int()
+int64_t wj::Stack::pop_int()
 {
     return 0;
 }

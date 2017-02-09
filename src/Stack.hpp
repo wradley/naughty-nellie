@@ -19,11 +19,11 @@ namespace wj
         Stack(const Stack &) = delete;
         ~Stack();
 
-        void     push_int(uint64_t num);
+        void     push_int(int64_t num);
         void     push_flt(double num);
         void     push_str(const char *str);
 
-        uint64_t pop_int();
+        int64_t  pop_int();
         double   pop_flt();
         char*    pop_str();
 
