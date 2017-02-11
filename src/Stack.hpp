@@ -19,18 +19,21 @@ namespace wj
         Stack(const Stack &) = delete;
         ~Stack();
 
-        void     push_int(int64_t num);
-        void     push_flt(double num);
-        void     push_str(const char *str);
+        void        push_int(int64_t num);
+        void        push_flt(double num);
+        void        push_str(const char *str);
 
-        int64_t  pop_int();
-        double   pop_flt();
-        char*    pop_str();
+        int64_t     pop_int();
+        double      pop_flt();
+        std::string pop_str();
+
+        std::string debug_to_string();
 
     private:
 
         void *_head, *_tail;
-        void *_max_size;
+        void *_max_size_ptr;
+        uint64_t _max_size;
 
         // space left between tail and max size
         // - if negative number is returned then a resize is needed
