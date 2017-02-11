@@ -1,6 +1,10 @@
 #ifndef __POSITION_COMPONENT_H__
 #define __POSITION_COMPONENT_H__
 
+#include <cstdint>
+#include "../util/Vec2.hpp"
+#include "../util/Poly.hpp"
+
 namespace wj
 {
     struct PositionComponent

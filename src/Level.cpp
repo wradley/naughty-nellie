@@ -1,4 +1,27 @@
 #include "Level.hpp"
+#include <cassert>
+#include <thread>
+
+void sleep(int time)
+{
+    assert(0);
+}
+
+// thread functions
+namespace
+{
+    void start_position_loop(wj::PositionSystem &pos_sys, bool &running, bool &paused)
+    {
+        while (running)
+        {
+            if (!paused)
+            {
+                pos_sys.update();
+                sleep(10);
+            }
+        }
+    }
+}
 
 wj::Level::Level()
 {
@@ -49,7 +72,7 @@ void wj::Level::run()
     while (is_loading()); // wait to finish load
 
     // start each system update function on its own thread
-    std::thread position_sys_thread(_position_sys.update, _running, _paused);
+    std::thread position_sys_thread(start_position_loop, std::ref(_position_sys), std::ref(_running), std::ref(_paused));
 
     // detach each system
     position_sys_thread.detach();

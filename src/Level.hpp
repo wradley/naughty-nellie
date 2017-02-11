@@ -1,6 +1,9 @@
 #ifndef __LEVEL_H__
 #define __LEVEL_H__
 
+#include <string>
+#include "systems/PositionSystem.hpp"
+
 namespace wj
 {
     class Level
@@ -28,6 +31,9 @@ namespace wj
 
         bool _running, _loading, _saving, _needs_save, _paused;
         std::string _level_file, _def_file;
+
+        // systems
+        PositionSystem _position_sys;
 
     };
 };
