@@ -1,8 +1,10 @@
 #include "VM.hpp"
 #include <cassert>
 #include <fstream>
+#include "Poly.hpp"
 
-wj::VM::VM()
+wj::VM::VM(PositionSystem &position_sys) :
+_position_sys(position_sys)
 {}
 
 wj::VM::~VM()
@@ -12,7 +14,11 @@ namespace
 {
     int get_command(const std::string &line)
     {
-        // numbers can be at most 4 digits
+        // comment or empty line
+        if (line[0] == '#' || line == "") return -1;
+
+        // numbers can be at most 5 digits
+        static const int MAX_DIGITS = 5;
         int i = 1;
 
         while (true)
@@ -20,10 +26,10 @@ namespace
             if (line[i] == ' ' || line[i] == '\0') break;
             ++i;
 
-            // make sure something less than 4 digits was found
-            if (i > 3)
+            // make sure something less than MAX_DIGITS digits were found
+            if (i >= MAX_DIGITS)
             {
-                printf("VM get_command - command was larger than 4 digits\n");
+                printf("VM get_command - command was larger than MAX_DIGITS digits\n");
                 assert(0);
             }
         }
@@ -33,18 +39,39 @@ namespace
 
     std::string get_value(const std::string &line)
     {
-        // look for space
-        int i = 0;
-        for (auto c : line)
+        int i, j;
+
+        // look for space / start of value
+        for (i = 0; i < line.size(); ++i)
         {
-            if (c == ' ') break;
-            ++i;
+            if (line[i] == ' ') break;
         }
-        return line.substr(i+1);
+
+        // look for '#' (comment)
+        for (j = 1; j < line.size(); ++j)
+        {
+            if (line[j] == '#') break;
+        }
+
+        return line.substr(i+1, j);
+    }
+
+    wj::Poly make_polygon(wj::Stack &s)
+    {
+        int num_verts = s.pop_int();
+        wj::Poly p(num_verts);
+        for (int i = 0; i < num_verts; ++i)
+        {
+            double a = s.pop_flt();
+            double b = s.pop_flt();
+            p.add_vert({a, b});
+        }
+        return p;
     }
 };
 
 
+// simple wrapper for other run
 bool wj::VM::run(const char *file)
 {
     std::string f(file);
@@ -69,10 +96,12 @@ bool wj::VM::run(const std::string &file)
 
         // process the command
         std::string str1;
-        double dbl1;
-        int64_t int1;
+        double dbl1, dbl2;
+        int64_t int1, int2, int3;
         switch (command)
         {
+        case -1: // comment or empty line
+            break;
         case 0: // push int
             _stack.push_int(std::stoll(get_value(line)));
             break;
@@ -87,6 +116,11 @@ bool wj::VM::run(const std::string &file)
             dbl1 = _stack.pop_flt();
             int1 = _stack.pop_int();
             printf("[%s] [%f] [%lli]\n", str1.c_str(), dbl1, int1);
+            break;
+
+        case 100:
+            int1 = _stack.pop_int(); // define id
+            _position_sys.define_ent((uint64_t) int1, make_polygon(_stack));
             break;
 
         default:

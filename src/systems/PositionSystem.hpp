@@ -15,12 +15,19 @@ namespace wj
         PositionSystem(const PositionSystem &) = delete;
         ~PositionSystem();
 
-        // to be called by game
-        void add_ent(uint64_t ent_instance_id, uint64_t ent_def_id, Vec2 position);
+
+        void define_ent(uint64_t ent_def_id, const Poly collider);
+        void add_ent(uint64_t ent_instance_id, uint64_t ent_def_id, Vec2 position, uint8_t layer);
+
+
+        // updates all the entities that have been requested to translate by other systems
         void update();
 
-        // to be called by other systems
+
+        // queues a request to translate an entity
+        //   (which will be translated upon the next update)
         void translate_ent(uint64_t ent_instance_id, Vec2 distance);
+
 
     private:
 

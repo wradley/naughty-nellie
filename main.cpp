@@ -1,10 +1,13 @@
 #include "src/util/VM.hpp"
+#include "src/systems/PositionSystem.hpp"
 using namespace wj;
 
 
 int main(int argc, char const *argv[])
 {
-    VM vm;
+    PositionSystem position_sys;
+
+    VM vm(position_sys);
     if (vm.run("game/defines/test.define"))
     {
         printf("File ran\n");

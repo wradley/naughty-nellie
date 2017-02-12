@@ -13,7 +13,13 @@ wj::PositionSystem::~PositionSystem()
 }
 
 
-void wj::PositionSystem::add_ent(uint64_t ent_instance_id, uint64_t ent_def_id, Vec2 position)
+void wj::PositionSystem::define_ent(uint64_t ent_def_id, const Poly collider)
+{
+
+}
+
+
+void wj::PositionSystem::add_ent(uint64_t ent_instance_id, uint64_t ent_def_id, Vec2 position, uint8_t layer)
 {
     assert(0);
 }
