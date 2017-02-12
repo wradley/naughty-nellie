@@ -2,6 +2,7 @@
 #define __VM_H__
 
 #include "Stack.hpp"
+#include <string>
 
 namespace wj
 {
@@ -12,6 +13,7 @@ namespace wj
         VM();
         ~VM();
 
+        bool run(const char *file);
         bool run(const std::string &file);
 
     private:
