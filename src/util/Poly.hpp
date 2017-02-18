@@ -21,6 +21,8 @@ namespace wj
         // - returns 0 if they're not colliding
         Vec2 min_translation(const Poly &other) const;
 
+        inline uint32_t num_verts() { return _num_verts; }
+
     private:
 
         Vec2 *_verts;

@@ -56,15 +56,15 @@ namespace
         return line.substr(i+1, j);
     }
 
-    wj::Poly make_polygon(wj::Stack &s)
+    wj::Poly* make_polygon(wj::Stack &s)
     {
         int num_verts = s.pop_int();
-        wj::Poly p(num_verts);
+        wj::Poly *p = new wj::Poly(num_verts);
         for (int i = 0; i < num_verts; ++i)
         {
             double a = s.pop_flt();
             double b = s.pop_flt();
-            p.add_vert({a, b});
+            p->add_vert({a, b});
         }
         return p;
     }

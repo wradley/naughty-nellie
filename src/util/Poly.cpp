@@ -43,7 +43,7 @@ wj::Poly::~Poly()
 
 void wj::Poly::add_vert(const Vec2 vert)
 {
-    if (_last_added_vert >= _num_verts - 1)
+    if (_last_added_vert >= _num_verts)
     {
         printf("Added too many verts to polygon.\n");
         assert(0);

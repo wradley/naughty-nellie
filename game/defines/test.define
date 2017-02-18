@@ -1,9 +1,14 @@
 # this is a comment
 
 # define a position to the position system
-0 1     # push layer
-1 0     # push y
-1 0     # push x
-1 0     # push entity instance id
-1 0     # push entity define id
+1 0     # push vert 4
+1 32
+1 32    # push vert 3
+1 32
+1 32    # push vert 2
+1 0
+1 0     # push vert 1
+1 0
+0 4     # push number of verts
+0 0     # push define id
 100     # call position_sys.define_ent(uint64_t ent_def_id, Poly collider);

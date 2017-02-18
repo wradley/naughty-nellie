@@ -35,7 +35,7 @@ Normal commands
 2) push string
 
 Position System commands
-100) define an entity (expects [..., flt b, flt a, int num_verts, int ent_def_id])
+100) define an entity (expects [..., flt b, flt a, int num_verts, int ent_def_id] in this order)
                         - needs a polygon so you must give the number of verts
                         - pos_sys.define_ent(uint64_t ent_def_id, Poly collider);
 
