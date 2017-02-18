@@ -28,7 +28,7 @@ namespace wj
         ~PositionSystem();
 
 
-        void define_ent(uint64_t ent_def_id, Poly *collider);
+        void define_ent(uint64_t ent_def_id, Poly collider);
         void add_ent(uint64_t ent_instance_id, uint64_t ent_def_id, Vec2 position, uint8_t layer);
 
 

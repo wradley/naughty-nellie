@@ -5,6 +5,22 @@ static const int DEF_START_SIZE         = 32;
 static const int INSTANCE_START_SIZE    = 64;
 static const int REQUEST_SIZE           = 128;
 
+namespace
+{
+    void resize_pos_comp_array(wj::PositionComponent *p, uint64_t &size)
+    {
+        size *= 2;
+        wj::PositionComponent *old = p;
+        p = new wj::PositionComponent [size];
+
+        for (int i = 0; i < size/2; ++i)
+        {
+            p[i] = old[i];
+        }
+
+        delete [] old;
+    }
+}
 
 wj::PositionSystem::PositionSystem() :
 _define_components(nullptr), _instance_components(nullptr), _requests(nullptr)
@@ -31,13 +47,20 @@ wj::PositionSystem::~PositionSystem()
 }
 
 
-void wj::PositionSystem::define_ent(uint64_t ent_def_id, Poly *collider)
+void wj::PositionSystem::define_ent(uint64_t ent_def_id, Poly collider)
 {
     _def_mutex.lock();
-    printf("Got id: %llu\n", ent_def_id);
-    printf("C Size: %i\n", collider->num_verts());
-    assert(0);
+
+    // check for resize
+    if (ent_def_id > _num_define_components)
+    {
+        resize_pos_comp_array(_define_components, _num_define_components);
+    }
+    _define_components[ent_def_id].collider = collider;
     _def_mutex.unlock();
+
+    printf("Got id: %llu\n", ent_def_id);
+    printf("C Size: %i\n", _define_components[ent_def_id].collider.num_verts());
 }
 
 void wj::PositionSystem::add_ent(uint64_t ent_instance_id, uint64_t ent_def_id, Vec2 position, uint8_t layer)

@@ -56,15 +56,15 @@ namespace
         return line.substr(i+1, j);
     }
 
-    wj::Poly* make_polygon(wj::Stack &s)
+    wj::Poly make_polygon(wj::Stack &s)
     {
         int num_verts = s.pop_int();
-        wj::Poly *p = new wj::Poly(num_verts);
+        wj::Poly p(num_verts);
         for (int i = 0; i < num_verts; ++i)
         {
             double a = s.pop_flt();
             double b = s.pop_flt();
-            p->add_vert({a, b});
+            p.add_vert({a, b});
         }
         return p;
     }
@@ -110,12 +110,6 @@ bool wj::VM::run(const std::string &file)
             break;
         case 2: // push str
             _stack.push_str(get_value(line).c_str());
-            break;
-        case 3: // temp for testing
-            str1 = _stack.pop_str();
-            dbl1 = _stack.pop_flt();
-            int1 = _stack.pop_int();
-            printf("[%s] [%f] [%lli]\n", str1.c_str(), dbl1, int1);
             break;
 
         case 100:

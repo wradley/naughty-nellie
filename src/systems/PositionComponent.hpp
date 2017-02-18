@@ -9,7 +9,7 @@ namespace wj
 {
     struct PositionComponent
     {
-        PositionComponent(Vec2 _pos = {0,0}, Poly *_collider = nullptr, uint8_t _layer = 0);
+        PositionComponent(Vec2 _pos = {0,0}, Poly _collider = {0}, uint8_t _layer = 0);
         PositionComponent(const PositionComponent &p);
         ~PositionComponent();
 
@@ -17,7 +17,7 @@ namespace wj
         Vec2 position;
 
         // all the vectors that make up the shape of the ent
-        Poly *collider;
+        Poly collider;
 
         // the layer the ent is on
         uint8_t layer;
