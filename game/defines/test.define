@@ -12,3 +12,36 @@
 0 4     # push number of verts
 0 0     # push define id
 100     # call position_sys.define_ent(uint64_t ent_def_id, Poly collider);
+
+
+# define a position to the position system
+1 47     # push vert 5
+1 32
+1 0     # push vert 4
+1 32
+1 32    # push vert 3
+1 32
+1 32    # push vert 2
+1 0
+1 0     # push vert 1
+1 0
+0 5     # push number of verts
+0 1     # push define id
+100     # call position_sys.define_ent(uint64_t ent_def_id, Poly collider);
+
+# define a position to the position system
+1 47     # push vert 5
+1 32
+1 47     # push vert 5
+1 32
+1 0     # push vert 4
+1 32
+1 32    # push vert 3
+1 32
+1 32    # push vert 2
+1 0
+1 0     # push vert 1
+1 0
+0 6     # push number of verts
+0 100     # push define id
+100     # call position_sys.define_ent(uint64_t ent_def_id, Poly collider);

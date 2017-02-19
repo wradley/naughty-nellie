@@ -1,15 +1,12 @@
 #include "PositionComponent.hpp"
 
-wj::PositionComponent::PositionComponent(
-    Vec2 _pos,
-    Poly _collider,
-    uint8_t _layer
-) :
-position(_pos), collider(_collider), layer(_layer)
+wj::PositionComponent::PositionComponent() :
+valid(false)
 {}
 
 wj::PositionComponent::PositionComponent(const PositionComponent &p) :
-position(p.position), collider(p.collider), layer(p.layer)
+position(p.position), collider(p.collider),
+layer(p.layer), no_clip(p.no_clip), valid(p.valid)
 {}
 
 wj::PositionComponent::~PositionComponent()

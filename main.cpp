@@ -15,5 +15,7 @@ int main(int argc, char const *argv[])
         printf("File not ran\n");
     }
 
+    printf("\n\n%s", position_sys.debug_define_to_string().c_str());
+
     return 0;
 }

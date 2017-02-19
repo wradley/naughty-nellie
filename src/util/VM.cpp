@@ -59,7 +59,7 @@ namespace
     wj::Poly make_polygon(wj::Stack &s)
     {
         int num_verts = s.pop_int();
-        wj::Poly p(num_verts);
+        wj::Poly p;
         for (int i = 0; i < num_verts; ++i)
         {
             double a = s.pop_flt();

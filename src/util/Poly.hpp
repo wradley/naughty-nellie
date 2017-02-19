@@ -10,7 +10,7 @@ namespace wj
     {
     public:
 
-        Poly(uint32_t num_verts);
+        Poly();
         Poly(const Poly &other);
         void operator= (const Poly &other);
         ~Poly();
@@ -22,11 +22,13 @@ namespace wj
         Vec2 min_translation(const Poly &other) const;
 
         inline uint32_t num_verts() { return _num_verts; }
+        Vec2 get_vert(uint32_t i) const;
 
     private:
 
         Vec2 *_verts;
-        uint32_t _num_verts, _last_added_vert;
+        uint32_t _num_verts; // how many verts are defined
+        uint32_t _max_verts; // how big the array is
 
     };
 };

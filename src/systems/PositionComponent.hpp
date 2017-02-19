@@ -9,7 +9,7 @@ namespace wj
 {
     struct PositionComponent
     {
-        PositionComponent(Vec2 _pos = {0,0}, Poly _collider = {0}, uint8_t _layer = 0);
+        PositionComponent();
         PositionComponent(const PositionComponent &p);
         ~PositionComponent();
 
@@ -24,6 +24,9 @@ namespace wj
 
         // if the object should worry about collisions
         bool no_clip;
+
+        // if the object in the array has been defined
+        bool valid;
     };
 };
 

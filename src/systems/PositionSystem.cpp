@@ -5,23 +5,6 @@ static const int DEF_START_SIZE         = 32;
 static const int INSTANCE_START_SIZE    = 64;
 static const int REQUEST_SIZE           = 128;
 
-namespace
-{
-    void resize_pos_comp_array(wj::PositionComponent *p, uint64_t &size)
-    {
-        size *= 2;
-        wj::PositionComponent *old = p;
-        p = new wj::PositionComponent [size];
-
-        for (int i = 0; i < size/2; ++i)
-        {
-            p[i] = old[i];
-        }
-
-        delete [] old;
-    }
-}
-
 wj::PositionSystem::PositionSystem() :
 _define_components(nullptr), _instance_components(nullptr), _requests(nullptr)
 {
@@ -51,16 +34,20 @@ void wj::PositionSystem::define_ent(uint64_t ent_def_id, Poly collider)
 {
     _def_mutex.lock();
 
-    // check for resize
-    if (ent_def_id > _num_define_components)
+    // resize if more space is needed
+    while (ent_def_id > _num_define_components)
     {
-        resize_pos_comp_array(_define_components, _num_define_components);
+        _num_define_components *= 2;
+        wj::PositionComponent *old = _define_components;
+        _define_components = new wj::PositionComponent [_num_define_components];
+        for (int i = 0; i < _num_define_components/2; ++i) _define_components[i] = old[i];
+        delete [] old;
     }
-    _define_components[ent_def_id].collider = collider;
-    _def_mutex.unlock();
 
-    printf("Got id: %llu\n", ent_def_id);
-    printf("C Size: %i\n", _define_components[ent_def_id].collider.num_verts());
+    // Create new component
+    _define_components[ent_def_id].collider = collider;
+    _define_components[ent_def_id].valid = true;
+    _def_mutex.unlock();
 }
 
 void wj::PositionSystem::add_ent(uint64_t ent_instance_id, uint64_t ent_def_id, Vec2 position, uint8_t layer)
@@ -141,4 +128,41 @@ int wj::PositionSystem::get_rotation()
     assert(0);
     _instance_mutex.unlock();
     return 0;
+}
+
+std::string wj::PositionSystem::debug_define_to_string()
+{
+    std::string ret_str;
+
+    _def_mutex.lock();
+    for (int i = 0; i < _num_define_components; ++i)
+    {
+        if (!_define_components[i].valid) continue;
+        ret_str += "Position System Define ID: [" + std::to_string(i) + "]\n";
+        int num_verts = _define_components[i].collider.num_verts();
+        for (int j = 0; j < num_verts; ++j)
+        {
+            Vec2 v = _define_components[i].collider.get_vert(j);
+            ret_str +=
+                "  " + std::to_string(v.x) + ", " +
+                std::to_string(v.y) + "\n";
+        }
+    }
+    _def_mutex.unlock();
+
+    return ret_str;
+}
+
+std::string wj::PositionSystem::debug_instance_to_string()
+{
+    _instance_mutex.lock();
+    _instance_mutex.unlock();
+    assert(0);
+}
+
+std::string wj::PositionSystem::debug_request_to_string()
+{
+    _request_mutex.lock();
+    _request_mutex.unlock();
+    assert(0);
 }

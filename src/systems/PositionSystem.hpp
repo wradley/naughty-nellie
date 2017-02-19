@@ -4,6 +4,7 @@
 #include "PositionComponent.hpp"
 #include <cstdint>
 #include <mutex>
+#include <string>
 #include "../util/Vec2.hpp"
 
 namespace wj
@@ -51,6 +52,11 @@ namespace wj
         Vec2    get_position(uint64_t ent_instance_id);
         uint8_t get_layer(uint64_t ent_instance_id);
         int     get_rotation();
+
+        // Debug
+        std::string debug_define_to_string();
+        std::string debug_instance_to_string();
+        std::string debug_request_to_string();
 
     private:
 
