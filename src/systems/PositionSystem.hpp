@@ -30,7 +30,7 @@ namespace wj
 
 
         void define_ent(uint64_t ent_def_id, Poly collider);
-        void add_ent(uint64_t ent_instance_id, uint64_t ent_def_id, Vec2 position, uint8_t layer);
+        void instantiate_ent(uint64_t ent_instance_id, uint64_t ent_def_id, Vec2 position, uint8_t layer, bool no_clip);
 
 
         // updates all the entities that have been requested to translate by other systems
