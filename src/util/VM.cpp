@@ -114,7 +114,11 @@ bool wj::VM::run(const std::string &file)
 
         case 100:
             int1 = _stack.pop_int(); // define id
-            _position_sys.define_ent((uint64_t) int1, make_polygon(_stack));
+            _position_sys.define_ent(
+                (uint64_t) int1,
+                make_polygon(_stack),
+                ((_stack.pop_int()==0) ? true : false)
+            );
             break;
 
         default:

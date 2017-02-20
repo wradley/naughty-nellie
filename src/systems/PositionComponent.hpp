@@ -15,6 +15,7 @@ namespace wj
 
         // global position in the world
         Vec2 position;
+        double rotation;
 
         // all the vectors that make up the shape of the ent
         Poly collider;
@@ -24,9 +25,6 @@ namespace wj
 
         // if the object should worry about collisions
         bool no_clip;
-
-        // if the object in the array has been defined
-        bool valid;
     };
 };
 

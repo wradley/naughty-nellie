@@ -1,4 +1,5 @@
 # define a position to the position system
+0 0     # push no_clip = false (so we clip)
 1 0     # push vert 4
 1 32
 1 32    # push vert 3
@@ -12,7 +13,8 @@
 100     # call position_sys.define_ent(uint64_t ent_def_id, Poly collider);
 
 # define a position to the position system
-1 47     # push vert 5
+0 0     # push no_clip = false (so we clip)
+1 47    # push vert 5
 1 32
 1 0     # push vert 4
 1 32
@@ -27,9 +29,10 @@
 100     # call position_sys.define_ent(uint64_t ent_def_id, Poly collider);
 
 # define a position to the position system
-1 47     # push vert 5
+0 0     # push no_clip = false (so we clip)
+1 47    # push vert 5
 1 32
-1 47     # push vert 5
+1 47    # push vert 5
 1 32
 1 0     # push vert 4
 1 32

@@ -30,8 +30,14 @@ namespace wj
         ~PositionSystem();
 
 
-        void define_ent(uint64_t ent_def_id, Poly collider);
-        void instantiate_ent(uint64_t ent_instance_id, uint64_t ent_def_id, Vec2 position, uint8_t layer, bool no_clip);
+        void define_ent(uint64_t ent_def_id, Poly collider, bool no_clip);
+        void instantiate_ent(
+            uint64_t ent_instance_id,
+            uint64_t ent_def_id,
+            Vec2 position,
+            double rotation,
+            uint8_t layer
+        );
 
 
         // updates all the entities that have been requested to translate by other systems
@@ -43,8 +49,8 @@ namespace wj
         //   (which will be changed upon the next update)
         void mod_ent_pos(uint64_t ent_instance_id, Vec2 distance);
         void set_ent_pos(uint64_t ent_instance_id, Vec2 pos);
-        void mod_ent_rotation(uint64_t ent_instance_id, int degrees);
-        void set_ent_rotation(uint64_t ent_instance_id, int degrees);
+        void mod_ent_rotation(uint64_t ent_instance_id, double deg);
+        void set_ent_rotation(uint64_t ent_instance_id, double deg);
         void mod_ent_layer(uint64_t ent_instance_id, int layer_diff);
         void set_ent_layer(uint64_t ent_instance_id, uint8_t layer);
 
@@ -52,7 +58,7 @@ namespace wj
         // getters
         Vec2    get_position(uint64_t ent_instance_id);
         uint8_t get_layer(uint64_t ent_instance_id);
-        int     get_rotation();
+        double  get_rotation(uint64_t ent_instance_id);
 
         // Debug
         std::string debug_define_to_string();
