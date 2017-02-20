@@ -6,6 +6,7 @@
 #include <mutex>
 #include <string>
 #include "../util/Vec2.hpp"
+#include "../util/FList.hpp"
 
 namespace wj
 {
@@ -63,13 +64,11 @@ namespace wj
         void handle_collisions(uint64_t ent_instance_id);
 
         // where all the defined components are stored to be copied into the instance components
-        PositionComponent *_define_components;
-        uint64_t _num_define_components;
+        FList<PositionComponent> _define_components;
 
         // Every entity must have a position so this will just be a simple array
         //   that uses the instance id as the index
-        PositionComponent *_instance_components;
-        uint64_t _num_instance_components;
+        FList<PositionComponent> _instance_components;
 
         PositionRequest *_requests;
         uint64_t _request_head, _request_tail, _max_num_requests;

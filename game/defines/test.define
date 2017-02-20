@@ -40,5 +40,5 @@
 1 0     # push vert 1
 1 0
 0 6     # push number of verts
-0 100     # push define id
+0 200     # push define id
 100     # call position_sys.define_ent(uint64_t ent_def_id, Poly collider);
