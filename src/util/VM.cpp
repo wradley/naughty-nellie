@@ -96,8 +96,8 @@ bool wj::VM::run(const std::string &file)
 
         // process the command
         std::string str1;
-        double dbl1, dbl2;
-        int64_t int1, int2, int3;
+        //double dbl1, dbl2;
+        int64_t int1;//, int2, int3;
         switch (command)
         {
         case -1: // comment or empty line

@@ -1,7 +1,9 @@
 #ifndef __FLIST_H__
 #define __FLIST_H__
 
-#include <stdio.h>
+#include "List.hpp"
+#include <cstdint>
+#include <cstdio>
 #include <string>
 
 static const int START_SIZE = 16;
@@ -13,7 +15,7 @@ static const int START_SIZE = 16;
 namespace wj
 {
     template <typename T>
-    class FList
+    class FList : public List<T>
     {
     public:
 
