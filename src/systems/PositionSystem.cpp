@@ -1,24 +1,8 @@
 #include "PositionSystem.hpp"
 #include <cassert>
 
-static const int REQUEST_SIZE           = 128;
-
-wj::PositionSystem::PositionSystem() : _requests(nullptr)
-{
-    // alloc space
-    _requests = new PositionRequest[REQUEST_SIZE];
-
-    // set values
-    _max_num_requests = REQUEST_SIZE;
-    _request_head = _request_tail = 0;
-}
-
-
-wj::PositionSystem::~PositionSystem()
-{
-    // dealloc space
-    if (_requests   != nullptr) delete [] _requests;
-}
+wj::PositionSystem::PositionSystem() {}
+wj::PositionSystem::~PositionSystem() {}
 
 
 void wj::PositionSystem::define_ent(
@@ -63,7 +47,27 @@ void wj::PositionSystem::instantiate_ent(
 void wj::PositionSystem::update()
 {
     _instance_mutex.lock();
-    assert(0);
+    _request_mutex.lock();
+
+    while (!_requests.is_empty())
+    {
+        PositionRequest pr = _requests.pop();
+        uint64_t i = pr.ent_instance_id;
+
+        // update position
+        if (pr.set_pos) _instance_components[i].position = pr.dist;
+        else _instance_components[i].position += pr.dist;
+
+        // update layer
+        if (pr.set_layer) _instance_components[i].layer = pr.layer;
+        else _instance_components[i].layer += pr.layer;
+
+        // update rotation
+        if (pr.set_rot) _instance_components[i].rotation = pr.rotation;
+        else _instance_components[i].rotation += pr.rotation;
+    }
+
+    _request_mutex.unlock();
     _instance_mutex.unlock();
 }
 

@@ -32,7 +32,7 @@ namespace wj
 
         T& operator[] (uint64_t index)
         {
-            SListElement<T> *ret_node;
+            SListElement<T> *ret_node = nullptr;
 
             // List is empty (node needs to be created)
             if (_num_nodes == 0)

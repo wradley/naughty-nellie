@@ -6,7 +6,8 @@
 #include <mutex>
 #include <string>
 #include "../util/Vec2.hpp"
-#include "../util/FList.hpp"
+#include "../util/ds/FList.hpp"
+#include "../util/ds/Queue.hpp"
 
 namespace wj
 {
@@ -19,6 +20,7 @@ namespace wj
 
         bool set_pos; // true = set position rather than translate position
         bool set_layer; // true = set layer rather than modify layer (+/- some ammount)
+        bool set_rot; // true = ""
     };
 
     class PositionSystem
@@ -76,10 +78,10 @@ namespace wj
         //   that uses the instance id as the index
         FList<PositionComponent> _instance_components;
 
-        PositionRequest *_requests;
-        uint64_t _request_head, _request_tail, _max_num_requests;
+        // Holds a list of requests all to be updated at once everytime update() is called
+        Queue<PositionRequest> _requests;
 
-
+        // Locks for the data structures
         std::mutex _instance_mutex, _def_mutex, _request_mutex;
 
     };
