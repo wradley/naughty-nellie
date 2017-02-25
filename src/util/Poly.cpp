@@ -2,6 +2,37 @@
 #include <cstdio>
 #include <cassert>
 
+wj::VertItr::VertItr(Poly &p, uint32_t index) :
+_p(p), _index(index)
+{}
+
+wj::VertItr::VertItr(const VertItr &other) :
+_p(other._p), _index(other._index)
+{}
+
+
+bool wj::VertItr::operator!= (const VertItr &other)
+{
+    return (_index != other._index);
+}
+
+wj::VertItr wj::VertItr::operator++ ()
+{
+    ++_index;
+    return *this;
+}
+
+wj::Vec2& wj::VertItr::operator* ()
+{
+    return _p._verts[_index];
+}
+
+wj::Vec2& wj::VertItr::operator-> ()
+{
+    return _p._verts[_index];
+}
+
+
 wj::Poly::Poly() :
 _verts(nullptr), _num_verts(0), _max_verts(0)
 {
@@ -72,4 +103,16 @@ wj::Vec2 wj::Poly::get_vert(uint32_t i) const
 {
     if (i < _num_verts) return _verts[i];
     else return {0,0};
+}
+
+wj::VertItr wj::Poly::begin()
+{
+    VertItr v(*this, 0);
+    return v;
+}
+
+wj::VertItr wj::Poly::end()
+{
+    VertItr v(*this, _num_verts-1);
+    return v;
 }

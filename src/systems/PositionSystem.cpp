@@ -230,8 +230,14 @@ std::string wj::PositionSystem::debug_instance_to_string()
     for (auto p_comp : _instance_components)
     {
         ret_str += "Instance: " + std::to_string(p_comp.id) + "\n";
-        ret_str += "X: " + std::to_string(p_comp.position.x) + " ";
-        ret_str += "Y: " + std::to_string(p_comp.position.y) + "\n";
+        ret_str += "  [" + std::to_string(p_comp.position.x) + ", ";
+        ret_str += std::to_string(p_comp.position.y) + "]\n";
+        ret_str += "  Verts:\n";
+        for (auto vert : p_comp.collider)
+        {
+            ret_str += "    [" + std::to_string(vert.x) + ", ";
+            ret_str += std::to_string(vert.y) + "]\n";
+        }
     }
     _instance_mutex.unlock();
 

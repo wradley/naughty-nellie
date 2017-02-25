@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
     position_sys.instantiate_ent(0, 0, {1,1}, 0, 2);
     position_sys.instantiate_ent(1, 1, {0,0}, 0, 2);
     position_sys.instantiate_ent(2, 1, {0,0}, 0, 2);
-    position_sys.instantiate_ent(3, 1, {0,0}, 0, 2);
+    position_sys.instantiate_ent(3, 200, {0,0}, 0, 2);
 
     printf("\nDEFINE:\n%s\n", position_sys.debug_define_to_string().c_str());
     printf("\nINSTAN:\n%s\n", position_sys.debug_instance_to_string().c_str());
