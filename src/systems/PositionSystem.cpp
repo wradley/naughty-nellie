@@ -51,20 +51,33 @@ void wj::PositionSystem::update()
 
     while (!_requests.is_empty())
     {
-        PositionRequest pr = _requests.pop();
-        uint64_t i = pr.ent_instance_id;
+        PositionRequest *pr = _requests.pop();
+        uint64_t i = pr->ent_instance_id;
 
-        // update position
-        if (pr.set_pos) _instance_components[i].position = pr.dist;
-        else _instance_components[i].position += pr.dist;
-
-        // update layer
-        if (pr.set_layer) _instance_components[i].layer = pr.layer;
-        else _instance_components[i].layer += pr.layer;
-
-        // update rotation
-        if (pr.set_rot) _instance_components[i].rotation = pr.rotation;
-        else _instance_components[i].rotation += pr.rotation;
+        switch (pr->type) {
+            case SET_POS:
+                _instance_components[i].position = pr->dist;
+                break;
+            case MOD_POS:
+                _instance_components[i].position += pr->dist;
+                break;
+            case SET_LAYER:
+                _instance_components[i].layer = pr->layer;
+                break;
+            case MOD_LAYER:
+                _instance_components[i].layer += pr->layer;
+                break;
+            case SET_ROT:
+                _instance_components[i].rotation = pr->rotation;
+                break;
+            case MOD_ROT:
+                _instance_components[i].rotation += pr->rotation;
+                break;
+            default:
+                assert(0);
+                break;
+        }
+        delete pr;
     }
 
     _request_mutex.unlock();
@@ -74,42 +87,66 @@ void wj::PositionSystem::update()
 void wj::PositionSystem::mod_ent_pos(uint64_t ent_instance_id, Vec2 distance)
 {
     _request_mutex.lock();
-    assert(0);
+    PositionRequest *pr = new PositionRequest;
+    pr->ent_instance_id = ent_instance_id;
+    pr->dist = distance;
+    pr->type = MOD_POS;
+    _requests.push(pr);
     _request_mutex.unlock();
 }
 
 void wj::PositionSystem::set_ent_pos(uint64_t ent_instance_id, Vec2 pos)
 {
     _request_mutex.lock();
-    assert(0);
+    PositionRequest *pr = new PositionRequest;
+    pr->ent_instance_id = ent_instance_id;
+    pr->dist = pos;
+    pr->type = SET_POS;
+    _requests.push(pr);
     _request_mutex.unlock();
 }
 
 void wj::PositionSystem::mod_ent_rotation(uint64_t ent_instance_id, double deg)
 {
     _request_mutex.lock();
-    assert(0);
+    PositionRequest *pr = new PositionRequest;
+    pr->ent_instance_id = ent_instance_id;
+    pr->rotation = deg;
+    pr->type = MOD_ROT;
+    _requests.push(pr);
     _request_mutex.unlock();
 }
 
 void wj::PositionSystem::set_ent_rotation(uint64_t ent_instance_id, double deg)
 {
     _request_mutex.lock();
-    assert(0);
+    PositionRequest *pr = new PositionRequest;
+    pr->ent_instance_id = ent_instance_id;
+    pr->rotation = deg;
+    pr->type = SET_ROT;
+    _requests.push(pr);
     _request_mutex.unlock();
 }
 
 void wj::PositionSystem::mod_ent_layer(uint64_t ent_instance_id, int layer_diff)
 {
     _request_mutex.lock();
-    assert(0);
+    PositionRequest *pr = new PositionRequest;
+    pr->ent_instance_id = ent_instance_id;
+    pr->layer = layer_diff;
+    pr->type = MOD_LAYER;
+    _requests.push(pr);
     _request_mutex.unlock();
 }
 
 void wj::PositionSystem::set_ent_layer(uint64_t ent_instance_id, uint8_t layer)
 {
     _request_mutex.lock();
-    assert(0);
+    PositionRequest *pr = new PositionRequest;
+    pr->ent_instance_id = ent_instance_id;
+    pr->layer = layer;
+    pr->type = SET_LAYER;
+    _requests.push(pr);
     _request_mutex.unlock();
 }
 

@@ -6,21 +6,29 @@
 #include <mutex>
 #include <string>
 #include "../util/Vec2.hpp"
-#include "../util/ds/FList.hpp"
+#include "../util/ds/List.hpp"
 #include "../util/ds/Queue.hpp"
 
 namespace wj
 {
+    enum RequestType
+    {
+        SET_POS,
+        MOD_POS,
+        SET_LAYER,
+        MOD_LAYER,
+        SET_ROT,
+        MOD_ROT
+    };
+
     struct PositionRequest
     {
         uint64_t ent_instance_id;
         Vec2 dist;
         int layer;
-        int rotation;
+        double rotation;
 
-        bool set_pos; // true = set position rather than translate position
-        bool set_layer; // true = set layer rather than modify layer (+/- some ammount)
-        bool set_rot; // true = ""
+        RequestType type;
     };
 
     class PositionSystem
@@ -72,14 +80,14 @@ namespace wj
         void handle_collisions(uint64_t ent_instance_id);
 
         // where all the defined components are stored to be copied into the instance components
-        FList<PositionComponent> _define_components;
+        List<PositionComponent> _define_components;
 
         // Every entity must have a position so this will just be a simple array
         //   that uses the instance id as the index
-        FList<PositionComponent> _instance_components;
+        List<PositionComponent> _instance_components;
 
         // Holds a list of requests all to be updated at once everytime update() is called
-        Queue<PositionRequest> _requests;
+        Queue<PositionRequest*> _requests;
 
         // Locks for the data structures
         std::mutex _instance_mutex, _def_mutex, _request_mutex;

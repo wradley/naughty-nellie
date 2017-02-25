@@ -1,6 +1,6 @@
 #include "src/util/VM.hpp"
 #include "src/systems/PositionSystem.hpp"
-#include "src/util/ds/SList.hpp"
+#include "src/util/ds/List.hpp"
 #include "src/util/ds/Queue.hpp"
 using namespace wj;
 
@@ -16,34 +16,25 @@ struct Test
 
 int main(int argc, char const *argv[])
 {
-    // PositionSystem position_sys;
-    //
-    // VM vm(position_sys);
-    // if (vm.run("game/defines/test.define"))
-    // {
-    //     printf("File ran\n");
-    // } else {
-    //     printf("File not ran\n");
-    // }
-    //
-    // printf("\n\n%s\n", position_sys.debug_define_to_string().c_str());
+    PositionSystem position_sys;
 
-    SList<Test> list;
-    list[100] = 100;
-    list[2] = 2;
-    list[89] = 89;
-    list[1000] = 1000;
-    printf("%s\n", list.debug_to_string().c_str());
+    VM vm(position_sys);
+    if (vm.run("game/defines/test.define"))
+    {
+        printf("File ran\n");
+    } else {
+        printf("File not ran\n");
+    }
 
-    Queue<int> list2;
-    for (int i = 0; i < 100; ++i)
-    {
-        list2.push(i);
-    }
-    for (int i = 0; i < 100; ++i)
-    {
-        printf("%i\n", list2.pop());
-    }
+    position_sys.instantiate_ent(0, 0, {0,0}, 0, 2);
+    position_sys.instantiate_ent(1, 1, {0,0}, 0, 2);
+
+    printf("\nDEFINE:\n%s\n", position_sys.debug_define_to_string().c_str());
+    printf("\nINSTAN:\n%s\n", position_sys.debug_instance_to_string().c_str());
+
+    position_sys.mod_ent_pos(1, {1000, 1000});
+
+    printf("\nINSTAN:\n%s\n", position_sys.debug_instance_to_string().c_str());
 
     return 0;
 }
