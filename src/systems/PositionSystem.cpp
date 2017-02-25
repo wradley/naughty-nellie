@@ -37,6 +37,7 @@ void wj::PositionSystem::instantiate_ent(
 
     // Create new instance component
     _instance_components[ent_instance_id] = _define_components[ent_def_id];
+    _instance_components[ent_instance_id].id = ent_instance_id;
     _instance_components[ent_instance_id].position = position;
     _instance_components[ent_instance_id].layer = layer;
     _instance_components[ent_instance_id].rotation = rotation;
@@ -225,7 +226,13 @@ std::string wj::PositionSystem::debug_instance_to_string()
     std::string ret_str;
 
     _instance_mutex.lock();
-    ret_str = _instance_components.debug_to_string();
+    ret_str = _instance_components.debug_to_string() + "\n";
+    for (auto p_comp : _instance_components)
+    {
+        ret_str += "Instance: " + std::to_string(p_comp.id) + "\n";
+        ret_str += "X: " + std::to_string(p_comp.position.x) + " ";
+        ret_str += "Y: " + std::to_string(p_comp.position.y) + "\n";
+    }
     _instance_mutex.unlock();
 
     return ret_str;

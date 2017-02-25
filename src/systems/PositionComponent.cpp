@@ -4,8 +4,12 @@ wj::PositionComponent::PositionComponent()
 {}
 
 wj::PositionComponent::PositionComponent(const PositionComponent &p) :
-position(p.position), collider(p.collider),
-layer(p.layer), no_clip(p.no_clip)
+id(p.id),
+position(p.position),
+rotation(p.rotation),
+collider(p.collider),
+layer(p.layer),
+no_clip(p.no_clip)
 {}
 
 wj::PositionComponent::~PositionComponent()

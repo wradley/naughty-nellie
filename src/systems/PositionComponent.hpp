@@ -13,6 +13,9 @@ namespace wj
         PositionComponent(const PositionComponent &p);
         ~PositionComponent();
 
+        // Optional (can be used by certain lists to keep track of position)
+        uint64_t id;
+
         // global position in the world
         Vec2 position;
         double rotation;

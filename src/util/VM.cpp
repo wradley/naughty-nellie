@@ -90,9 +90,9 @@ bool wj::VM::run(const std::string &file)
     while (std::getline(fin, line))
     {
         // get the command
-        printf("%s\n", line.c_str());
+        //printf("%s\n", line.c_str());
         command = get_command(line);
-        printf("command: %i\n", command);
+        //printf("command: %i\n", command);
 
         // process the command
         std::string str1;
