@@ -36,8 +36,31 @@ namespace wj
             _valid_list[_length-1] = true;
         }
 
-        List(const List &other) = delete;
-        void operator= (const List &other) = delete;
+        List(const List &other)
+        {
+            _length = other._length;
+            _item_size = other._item_size;
+
+            // copy over data
+            for (uint64_t i = 0; i < _length; ++i)
+            {
+                _data_list[i] = other._data_list[i];
+                _valid_list[i] = other._valid_list[i];
+            }
+        }
+
+        void operator= (const List &other)
+        {
+            _length = other._length;
+            _item_size = other._item_size;
+
+            // copy over data
+            for (uint64_t i = 0; i < _length; ++i)
+            {
+                _data_list[i] = other._data_list[i];
+                _valid_list[i] = other._valid_list[i];
+            }
+        }
 
         ~List()
         {
@@ -62,7 +85,7 @@ namespace wj
                 _valid_list = new bool [_length];
 
                 // copy over data
-                int i;
+                uint64_t i;
                 for (i = 0; i < _length/2; ++i)
                 {
                     _data_list[i] = old_data_list[i];

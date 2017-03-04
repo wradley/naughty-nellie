@@ -1,96 +1,242 @@
 #include "Level.hpp"
-#include <cassert>
+#include <SDL2/SDL.h>
 #include <thread>
-
-void sleep(int time)
-{
-    assert(0);
-}
-
-// thread functions
-namespace
-{
-    void start_position_loop(wj::PositionSystem &pos_sys, bool &running, bool &paused)
-    {
-        while (running)
-        {
-            if (!paused)
-            {
-                pos_sys.update();
-                sleep(10);
-            }
-        }
-    }
-}
+#include <iostream>
+#include <fstream>
 
 wj::Level::Level()
 {
-    assert(0);
+    _position_sys = new PositionSystem;
+    _graphics_sys = new GraphicsSystem;
+
+    init_vm();
 }
 
 wj::Level::~Level()
 {
-    assert(0);
+    free_systems();
 }
 
-bool wj::Level::set_level_file(const std::string &level_file_path)
+void wj::Level::load_define(std::string def_filepath)
 {
-    // returns false if file is not found
-    assert(0);
-    return false;
+    _level_lock.lock();
+
+    // delete system data
+    delete _position_sys;
+    delete _graphics_sys;
+
+    // create new system stuff
+    _position_sys = new PositionSystem;
+    _graphics_sys = new GraphicsSystem;
+    init_vm();
+
+    // load in data
+    _vm.run(def_filepath);
+
+    _level_lock.unlock();
 }
 
-bool wj::Level::set_defs_file(const std::string &def_file_path)
-{
-    // returns false if file is not found
-    assert(0);
-    return false;
-}
 
-bool wj::Level::is_loading()
+void wj::Level::run(std::string level_filepath)
 {
-    assert(0);
-    return false;
-}
-
-bool wj::Level::is_saving()
-{
-    assert(0);
-    return false;
-}
-
-void wj::Level::run()
-{
-    assert(0);
-
-    // Make sure to stop and save previous levels
+    // save and stop current level
     stop();
 
-    _running = true;
+    _level_lock.lock();
+
+    // load the level
+    _level_filename = level_filepath;
     load_level();
-    _needs_save = true;
-    while (is_loading()); // wait to finish load
 
-    // start each system update function on its own thread
-    std::thread position_sys_thread(start_position_loop, std::ref(_position_sys), std::ref(_running), std::ref(_paused));
+    // set state
+    _running = true;
+    _paused = true;
 
-    // detach each system
-    position_sys_thread.detach();
+    // start up position thread
+    std::thread tposition(
+        ([](PositionSystem *position_sys, bool *running){
+            while (*running)
+            {
+                position_sys->update();
+                SDL_Delay(100);
+            }
+        }),
+        _position_sys,
+        &_running
+    ); tposition.detach();
+
+    // start up graphics thread
+    std::thread tgraphics(
+        ([](GraphicsSystem *graphics_sys, bool *running){
+            while (*running)
+            {
+                graphics_sys->update();
+                SDL_Delay(100);
+            }
+        }),
+        _graphics_sys,
+        &_running
+    ); tgraphics.detach();
+
+    // un-pause game
+    _paused = false;
+    _level_lock.unlock();
+    printf("Unlocked\n");
 }
 
+// Use when quitting the application
 void wj::Level::stop()
 {
-    assert(0);
+    printf("Stop\n");
+    _level_lock.lock();
 
+    // stop the game
     _running = false;
+    _paused = false;
 
-    // save old data if previous level was loaded
-    if (_needs_save)
+    // wait for each system to finish its last update
+    SDL_Delay(500);
+
+    // save all level data
+    save();
+
+    // clear out all level data in each system
+    _position_sys->clear_instance_data();
+    _graphics_sys->clear_instance_data();
+
+    _level_lock.unlock();
+}
+
+
+void wj::Level::free_systems()
+{
+    delete _graphics_sys;
+    delete _position_sys;
+}
+
+
+void wj::Level::exit()
+{
+    stop();
+    free_systems();
+    SDL_Quit();
+}
+
+
+void wj::Level::init_vm()
+{
+    if (_position_sys == NULL)
     {
-        // let system threads finish their last updates
-        sleep(100);
-        save_level();
+        printf("Error Position System Null in Level\n");
+        assert(0);
     }
 
-    while (is_saving()); // wait to finish save
+    if (_graphics_sys == NULL)
+    {
+        printf("Error Graphics System Null in Level\n");
+        assert(0);
+    }
+
+    _vm.init(_position_sys);
+    _vm.init(_graphics_sys);
+}
+
+static std::string get_next_word(std::string &str, uint64_t &i)
+{
+    std::string word = "";
+
+    // find front of next word
+    while (str[i] == ' ' || str[i] == '\n')
+    {
+        if (i >= str.size())
+        {
+            printf("Got word: EOF\n");
+            return "EOF";
+        }
+        ++i;
+    }
+
+    // store word
+    while (str[i] != ' ' && str[i] != '\n')
+    {
+        if (i >= str.size())
+        {
+            printf("Got word: EOF\n");
+            return "EOF";
+        }
+
+        word.push_back(str[i]);
+        ++i;
+    }
+    printf("Got word: %s\n", word.c_str());
+    return word;
+}
+
+std::string file_to_str(const std::string &filename)
+{
+    std::FILE *fp = std::fopen(filename.c_str(), "rb");
+    if (fp)
+    {
+        std::string contents;
+        std::fseek(fp, 0, SEEK_END);
+        contents.resize(std::ftell(fp));
+        std::rewind(fp);
+        std::fread(&contents[0], 1, contents.size(), fp);
+        std::fclose(fp);
+        return(contents);
+    }
+    assert(0);
+}
+
+void save_str_to_file(const std::string &str, const std::string &filename)
+{
+    std::ofstream file(filename);
+    file << str;
+    file.close();
+}
+
+void wj::Level::load_level()
+{
+    _save_lock.lock();
+    std::string level_str(file_to_str(_level_filename));
+    uint64_t i = 0;
+    uint64_t instance_num = 0;
+
+    _ent_data.clear();
+
+    std::string word;
+    while (i < (level_str.size() - 6))
+    {
+        EntData e;
+        e.def_id = std::stoi(get_next_word(level_str, i));
+        e.x = std::stod(get_next_word(level_str, i));
+        e.y = std::stod(get_next_word(level_str, i));
+        e.rotation = std::stod(get_next_word(level_str, i));
+        e.layer = std::stoi(get_next_word(level_str, i));
+        _ent_data[instance_num++] = e;
+    }
+    _save_lock.unlock();
+}
+
+// saves a level out to the file used to load level
+void wj::Level::save()
+{
+    _save_lock.lock();
+
+    // load contents of _ent_data into string
+    std::string level_str;
+
+    for (auto e : _ent_data)
+    {
+        std::string line = "";
+        line += std::to_string(e.def_id) + " ";
+        line += std::to_string(e.x) + " ";
+        line += std::to_string(e.y) + " ";
+        line += std::to_string(e.rotation) + " ";
+        line += std::to_string(e.layer) + "\n";
+    }
+
+    // save string out to file
+    save_str_to_file(level_str, _level_filename);
+    _save_lock.unlock();
 }

@@ -4,6 +4,7 @@
 #include "Stack.hpp"
 #include <string>
 #include "../systems/PositionSystem.hpp"
+#include "../systems/GraphicsSystem.hpp"
 
 namespace wj
 {
@@ -11,8 +12,11 @@ namespace wj
     {
     public:
 
-        VM(PositionSystem &position_sys);
+        VM();
         ~VM();
+
+        inline void init(PositionSystem *p) {_position_sys = p;}
+        inline void init(GraphicsSystem *g) {_graphics_sys = g;}
 
         bool run(const char *file);
         bool run(const std::string &file);
@@ -22,7 +26,8 @@ namespace wj
         Stack _stack;
 
         // Systems
-        PositionSystem &_position_sys;
+        PositionSystem *_position_sys;
+        GraphicsSystem *_graphics_sys;
 
     };
 };

@@ -3,8 +3,7 @@
 #include <fstream>
 #include "Poly.hpp"
 
-wj::VM::VM(PositionSystem &position_sys) :
-_position_sys(position_sys)
+wj::VM::VM()
 {}
 
 wj::VM::~VM()
@@ -90,14 +89,13 @@ bool wj::VM::run(const std::string &file)
     while (std::getline(fin, line))
     {
         // get the command
-        //printf("%s\n", line.c_str());
         command = get_command(line);
-        //printf("command: %i\n", command);
+
+        std::string str1;
+        //double dbl1, dbl2, dbl3;
+        int64_t int1;//, int2, int3;
 
         // process the command
-        std::string str1;
-        //double dbl1, dbl2;
-        int64_t int1;//, int2, int3;
         switch (command)
         {
         case -1: // comment or empty line
@@ -112,9 +110,10 @@ bool wj::VM::run(const std::string &file)
             _stack.push_str(get_value(line).c_str());
             break;
 
-        case 100:
+        case 100: // DEFINE position
             int1 = _stack.pop_int(); // define id
-            _position_sys.define_ent(
+            if (_position_sys == nullptr) assert(0);
+            _position_sys->define_ent(
                 (uint64_t) int1,
                 make_polygon(_stack),
                 ((_stack.pop_int()==0) ? true : false)

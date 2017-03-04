@@ -2,10 +2,21 @@
 #define __LEVEL_H__
 
 #include <string>
+#include <mutex>
 #include "systems/PositionSystem.hpp"
+#include "systems/GraphicsSystem.hpp"
+#include "util/VM.hpp"
+#include "util/ds/List.hpp"
 
 namespace wj
 {
+    struct EntData
+    {
+        uint64_t def_id;
+        double x, y, rotation;
+        uint8_t layer;
+    };
+
     class Level
     {
     public:
@@ -13,28 +24,45 @@ namespace wj
         Level();
         ~Level();
 
-        // returns false if file is not found
-        bool set_level_file(const std::string &level_file_path);
-        bool set_defs_file(const std::string &def_file_path);
+        // Loads a define file into the engine
+        void load_define(std::string def_filepath);
 
-        bool is_loading();
-        bool is_saving();
+        // can simply run another level without calling stop
+        void run(std::string level_filepath);
 
-        void run();
+        // saves a level out to the file used to load level
+        void save();
+
+        // Use when quitting the application
         void stop();
+
+        // exits application
+        void exit();
 
     private:
 
-        bool load_defs();
-        bool load_level();
-        bool save_level();
+        void load_level();
+        std::string _level_filename;
+        List<EntData> _ent_data;
 
-        bool _running, _loading, _saving, _needs_save, _paused;
-        std::string _level_file, _def_file;
+        // frees all systems
+        void free_systems();
 
-        // systems
-        PositionSystem _position_sys;
+        // initialize the virtual machine with all the systems
+        void init_vm();
 
+        // Game states
+        bool _running, _paused;
+
+        // Systems
+        PositionSystem *_position_sys;
+        GraphicsSystem *_graphics_sys;
+
+        // Virtual Machine
+        VM _vm;
+
+        // Locks
+        std::mutex _save_lock, _level_lock;
     };
 };
 

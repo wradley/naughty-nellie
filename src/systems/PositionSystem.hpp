@@ -50,13 +50,15 @@ namespace wj
         );
 
 
-        // updates all the entities that have been requested to translate by other systems
-        //   and any collisions
+        // - updates all the entities that have been requested to
+        //   translate by other systems and any collisions
         void update();
 
+        // - clears out level data so a new one can be loaded in
+        void clear_instance_data();
 
-        // queues a request to change an entity
-        //   (which will be changed upon the next update)
+
+        // Setters
         void mod_ent_pos(uint64_t ent_instance_id, Vec2 distance);
         void set_ent_pos(uint64_t ent_instance_id, Vec2 pos);
         void mod_ent_rotation(uint64_t ent_instance_id, double deg);
@@ -65,7 +67,7 @@ namespace wj
         void set_ent_layer(uint64_t ent_instance_id, uint8_t layer);
 
 
-        // getters
+        // Getters
         Vec2    get_position(uint64_t ent_instance_id);
         uint8_t get_layer(uint64_t ent_instance_id);
         double  get_rotation(uint64_t ent_instance_id);
@@ -90,7 +92,7 @@ namespace wj
         Queue<PositionRequest*> _requests;
 
         // Locks for the data structures
-        std::mutex _instance_mutex, _def_mutex, _request_mutex;
+        std::mutex _lock;
 
     };
 };

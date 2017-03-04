@@ -1,4 +1,4 @@
-flags = -Wall -std=c++11
+flags = -Wall -std=c++11  -lSDL2 -lSDL2_image
 paths = src/*.o src/systems/*.o src/util/*.o
 app_name = app
 
