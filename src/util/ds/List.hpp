@@ -105,6 +105,7 @@ namespace wj
 
             // now that this index has been accessed it will be valid
             _valid_list[index] = true;
+            ++_num_items;
             return _data_list[index];
         }
 
@@ -117,14 +118,22 @@ namespace wj
             return false;
         }
 
+        bool is_empty()
+        {
+            if (_num_items > 0) return true;
+            else return false;
+        }
+
         void remove(uint64_t index)
         {
             if (index < _length-1) _valid_list[index] = false;
+            if (_num_items > 0) --_num_items;
         }
 
         void clear()
         {
             for (int i = 0; i < _length; ++i) _valid_list[i] = false;
+            _num_items = 0;
         }
 
         std::string debug_to_string()
@@ -158,7 +167,7 @@ namespace wj
         friend class ListItr<T>;
         T *_data_list;
         bool *_valid_list;
-        uint64_t _length, _item_size;
+        uint64_t _length, _item_size, _num_items;
 
     };
 

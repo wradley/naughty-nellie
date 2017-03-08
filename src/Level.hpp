@@ -5,6 +5,7 @@
 #include <mutex>
 #include "systems/PositionSystem.hpp"
 #include "systems/GraphicsSystem.hpp"
+#include "SDLWrap.hpp"
 #include "util/VM.hpp"
 #include "util/ds/List.hpp"
 
@@ -21,7 +22,7 @@ namespace wj
     {
     public:
 
-        Level();
+        Level(SDLWrap *sdl);
         ~Level();
 
         // Loads a define file into the engine
@@ -36,17 +37,20 @@ namespace wj
         // Use when quitting the application
         void stop();
 
-        // exits application
-        void exit();
-
     private:
+
+        // exits application (called by DTOR)
+        void exit();
 
         void load_level();
         std::string _level_filename;
         List<EntData> _ent_data;
 
+        SDLWrap *_sdl;
+
         // frees all systems
         void free_systems();
+        void init_systems();
 
         // initialize the virtual machine with all the systems
         void init_vm();

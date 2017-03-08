@@ -3,7 +3,7 @@
 
 #include <deque>
 #include <cassert>
-
+#include <stdio.h>
 // internals made from std::deque... will change soon
 
 namespace wj

@@ -4,30 +4,53 @@
 #include <iostream>
 #include <fstream>
 
-wj::Level::Level()
-{
-    _position_sys = new PositionSystem;
-    _graphics_sys = new GraphicsSystem;
+// thread functions
+namespace {
 
+    void position_start(wj::PositionSystem *position_sys, bool *running) {
+        while (*running)
+        {
+            position_sys->update();
+            printf("Updated PositionSystem\n");
+            SDL_Delay(100);
+        }
+        printf("Position Thread End\n");
+    }
+
+    void graphics_start(wj::GraphicsSystem *graphics_sys, bool *running) {
+        while (*running)
+        {
+            graphics_sys->update();
+            printf("Updated GraphicsSystem\n");
+            SDL_Delay(100);
+        }
+        printf("Graphics Thread End\n");
+    }
+};
+
+wj::Level::Level(SDLWrap *sdl) :
+_sdl(sdl)
+{
+    printf("Level Created\n");
+    _position_sys = new PositionSystem;
+    _graphics_sys = new GraphicsSystem(_sdl);
     init_vm();
+
+    printf("** SDLW addr Level CTOR: %p\n", _sdl);
 }
 
 wj::Level::~Level()
 {
-    free_systems();
+    exit();
 }
 
 void wj::Level::load_define(std::string def_filepath)
 {
     _level_lock.lock();
 
-    // delete system data
-    delete _position_sys;
-    delete _graphics_sys;
-
-    // create new system stuff
-    _position_sys = new PositionSystem;
-    _graphics_sys = new GraphicsSystem;
+    // reset system data
+    free_systems();
+    init_systems();
     init_vm();
 
     // load in data
@@ -52,31 +75,12 @@ void wj::Level::run(std::string level_filepath)
     _running = true;
     _paused = true;
 
-    // start up position thread
-    std::thread tposition(
-        ([](PositionSystem *position_sys, bool *running){
-            while (*running)
-            {
-                position_sys->update();
-                SDL_Delay(100);
-            }
-        }),
-        _position_sys,
-        &_running
-    ); tposition.detach();
+    // start up threads
+    std::thread tposition(position_start, _position_sys, &_running);
+    std::thread tgraphics(graphics_start, _graphics_sys, &_running);
 
-    // start up graphics thread
-    std::thread tgraphics(
-        ([](GraphicsSystem *graphics_sys, bool *running){
-            while (*running)
-            {
-                graphics_sys->update();
-                SDL_Delay(100);
-            }
-        }),
-        _graphics_sys,
-        &_running
-    ); tgraphics.detach();
+    tposition.detach();
+    tgraphics.detach();
 
     // un-pause game
     _paused = false;
@@ -87,7 +91,6 @@ void wj::Level::run(std::string level_filepath)
 // Use when quitting the application
 void wj::Level::stop()
 {
-    printf("Stop\n");
     _level_lock.lock();
 
     // stop the game
@@ -101,6 +104,7 @@ void wj::Level::stop()
     save();
 
     // clear out all level data in each system
+    printf("Stop\n");
     _position_sys->clear_instance_data();
     _graphics_sys->clear_instance_data();
 
@@ -110,8 +114,23 @@ void wj::Level::stop()
 
 void wj::Level::free_systems()
 {
-    delete _graphics_sys;
-    delete _position_sys;
+    if (_graphics_sys != nullptr)
+    {
+        delete _graphics_sys;
+        _graphics_sys = nullptr;
+    }
+
+    if (_position_sys != nullptr)
+    {
+        delete _position_sys;
+        _position_sys = nullptr;
+    }
+}
+
+void wj::Level::init_systems()
+{
+    _position_sys = new PositionSystem;
+    _graphics_sys = new GraphicsSystem(_sdl);
 }
 
 
@@ -119,7 +138,6 @@ void wj::Level::exit()
 {
     stop();
     free_systems();
-    SDL_Quit();
 }
 
 
@@ -221,22 +239,22 @@ void wj::Level::load_level()
 // saves a level out to the file used to load level
 void wj::Level::save()
 {
-    _save_lock.lock();
-
-    // load contents of _ent_data into string
-    std::string level_str;
-
-    for (auto e : _ent_data)
-    {
-        std::string line = "";
-        line += std::to_string(e.def_id) + " ";
-        line += std::to_string(e.x) + " ";
-        line += std::to_string(e.y) + " ";
-        line += std::to_string(e.rotation) + " ";
-        line += std::to_string(e.layer) + "\n";
-    }
-
-    // save string out to file
-    save_str_to_file(level_str, _level_filename);
-    _save_lock.unlock();
+    // _save_lock.lock();
+    //
+    // // load contents of _ent_data into string
+    // std::string level_str;
+    //
+    // for (auto e : _ent_data)
+    // {
+    //     std::string line = "";
+    //     line += std::to_string(e.def_id) + " ";
+    //     line += std::to_string(e.x) + " ";
+    //     line += std::to_string(e.y) + " ";
+    //     line += std::to_string(e.rotation) + " ";
+    //     line += std::to_string(e.layer) + "\n";
+    // }
+    //
+    // // save string out to file
+    // save_str_to_file(level_str, _level_filename);
+    // _save_lock.unlock();
 }
