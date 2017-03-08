@@ -31,7 +31,7 @@ void wj::GraphicsSystem::define_frame(
 ){
     std::lock_guard<std::mutex> lock(_lock);
 
-    if (!_sdl_textures.has(filepath))
+    if (_sdl_textures.find(filepath) == _sdl_textures.end())
     {
         _sdl_textures[filepath] = _sdl->make_texture(filepath);
     }
@@ -55,7 +55,7 @@ void wj::GraphicsSystem::set_animation(
     AnimationRequest *a = new AnimationRequest;
     a->ent_instance_id = ent_instance_id;
     a->animation_number = animation_number;
-    _animation_requests.push(a);
+    _animation_requests.push_back(a);
 }
 
 void wj::GraphicsSystem::render(
@@ -70,16 +70,17 @@ void wj::GraphicsSystem::render(
     r->y = y;
     r->w = w;
     r->h = h;
-    _render_requests.push(r);
+    _render_requests.push_back(r);
 }
 
 void wj::GraphicsSystem::update()
 {
     std::lock_guard<std::mutex> lock(_lock);
 
-    while (!_animation_requests.is_empty())
+    while (_animation_requests.size() > 0)
     {
-        AnimationRequest *r = _animation_requests.pop();
+        AnimationRequest *r = _animation_requests.front();
+        _animation_requests.pop_front();
         delete r;
     }
 
@@ -107,16 +108,18 @@ void wj::GraphicsSystem::clear_instance_data()
     _instance_animations.clear();
 
     // clear out animation requests
-    while (!_animation_requests.is_empty())
+    while (_animation_requests.size() > 0)
     {
-        AnimationRequest *ar = _animation_requests.pop();
+        AnimationRequest *ar = _animation_requests.front();
+        _animation_requests.pop_front();
         delete ar;
     }
 
     // clear out render requests
-    while (!_animation_requests.is_empty())
+    while (_render_requests.size() > 0)
     {
-        RenderRequest *rr = _render_requests.pop();
+        RenderRequest *rr = _render_requests.front();
+        _render_requests.pop_front();
         delete rr;
     }
 }

@@ -3,10 +3,9 @@
 
 #include <string>
 #include <mutex>
+#include <map>
+#include <deque>
 #include "../SDLWrap.hpp"
-#include "../util/ds/List.hpp"
-#include "../util/ds/Map.hpp"
-#include "../util/ds/Queue.hpp"
 
 namespace wj
 {
@@ -59,11 +58,11 @@ namespace wj
         SDLWrap *_sdl;
 
         // Graphics Data
-        Map<std::string, SDL_Texture*>   _sdl_textures;
-        List<DAnimation>                 _define_animations;
-        List<IAnimation>                 _instance_animations;
-        Queue<AnimationRequest*>         _animation_requests;
-        Queue<RenderRequest*>            _render_requests;
+        std::map<std::string, SDL_Texture*>   _sdl_textures;
+        std::map<uint64_t, DAnimation>        _define_animations;
+        std::map<uint64_t, IAnimation>        _instance_animations;
+        std::deque<AnimationRequest*>         _animation_requests;
+        std::deque<RenderRequest*>            _render_requests;
 
         // Lock
         std::mutex _lock;
@@ -84,7 +83,7 @@ namespace wj
     {
         void operator= (const DAnimation &other);
 
-        List<Frame> frames;
+        std::map<uint64_t, Frame> frames;
         int num_frames;
     };
 

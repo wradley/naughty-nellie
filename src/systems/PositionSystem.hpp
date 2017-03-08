@@ -5,9 +5,9 @@
 #include <cstdint>
 #include <mutex>
 #include <string>
+#include <map>
+#include <deque>
 #include "../util/Vec2.hpp"
-#include "../util/ds/List.hpp"
-#include "../util/ds/Queue.hpp"
 
 namespace wj
 {
@@ -72,24 +72,19 @@ namespace wj
         uint8_t get_layer(uint64_t ent_instance_id);
         double  get_rotation(uint64_t ent_instance_id);
 
-        // Debug
-        std::string debug_define_to_string();
-        std::string debug_instance_to_string();
-        std::string debug_request_to_string();
-
     private:
 
         void handle_collisions(uint64_t ent_instance_id);
 
         // where all the defined components are stored to be copied into the instance components
-        List<PositionComponent> _define_components;
+        std::map<uint64_t, PositionComponent> _define_components;
 
         // Every entity must have a position so this will just be a simple array
         //   that uses the instance id as the index
-        List<PositionComponent> _instance_components;
+        std::map<uint64_t, PositionComponent> _instance_components;
 
         // Holds a list of requests all to be updated at once everytime update() is called
-        Queue<PositionRequest*> _requests;
+        std::deque<PositionRequest*> _requests;
 
         // Locks for the data structures
         std::mutex _lock;

@@ -3,11 +3,11 @@
 
 #include <string>
 #include <mutex>
+#include <map>
 #include "systems/PositionSystem.hpp"
 #include "systems/GraphicsSystem.hpp"
 #include "SDLWrap.hpp"
 #include "util/VM.hpp"
-#include "util/ds/List.hpp"
 
 namespace wj
 {
@@ -44,7 +44,7 @@ namespace wj
 
         void load_level();
         std::string _level_filename;
-        List<EntData> _ent_data;
+        std::map<uint64_t, EntData> _ent_data;
 
         SDLWrap *_sdl;
 

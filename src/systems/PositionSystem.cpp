@@ -36,7 +36,7 @@ void wj::PositionSystem::instantiate_ent(
     std::lock_guard<std::mutex> lock(_lock);
 
     // make sure the component has been defined
-    if (!_define_components.exists(ent_def_id))
+    if (_define_components.find(ent_def_id) != _define_components.end())
     {
         printf("Position Component %llu not defined.\n", ent_def_id);
         assert(0);
@@ -54,9 +54,10 @@ void wj::PositionSystem::update()
 {
     std::lock_guard<std::mutex> lock(_lock);
 
-    while (!_requests.is_empty())
+    while (_requests.size() > 0)
     {
-        PositionRequest *pr = _requests.pop();
+        PositionRequest *pr = _requests.front();
+        _requests.pop_front();
         uint64_t i = pr->ent_instance_id;
 
         switch (pr->type) {
@@ -95,7 +96,7 @@ void wj::PositionSystem::mod_ent_pos(uint64_t ent_instance_id, Vec2 distance)
     pr->type = MOD_POS;
 
     std::lock_guard<std::mutex> lock(_lock);
-    _requests.push(pr);
+    _requests.push_back(pr);
 }
 
 void wj::PositionSystem::set_ent_pos(uint64_t ent_instance_id, Vec2 pos)
@@ -106,7 +107,7 @@ void wj::PositionSystem::set_ent_pos(uint64_t ent_instance_id, Vec2 pos)
     pr->type = SET_POS;
 
     std::lock_guard<std::mutex> lock(_lock);
-    _requests.push(pr);
+    _requests.push_back(pr);
 }
 
 void wj::PositionSystem::mod_ent_rotation(uint64_t ent_instance_id, double deg)
@@ -117,7 +118,7 @@ void wj::PositionSystem::mod_ent_rotation(uint64_t ent_instance_id, double deg)
     pr->type = MOD_ROT;
 
     std::lock_guard<std::mutex> lock(_lock);
-    _requests.push(pr);
+    _requests.push_back(pr);
 }
 
 void wj::PositionSystem::set_ent_rotation(uint64_t ent_instance_id, double deg)
@@ -128,7 +129,7 @@ void wj::PositionSystem::set_ent_rotation(uint64_t ent_instance_id, double deg)
     pr->type = SET_ROT;
 
     std::lock_guard<std::mutex> lock(_lock);
-    _requests.push(pr);
+    _requests.push_back(pr);
 }
 
 void wj::PositionSystem::mod_ent_layer(uint64_t ent_instance_id, int layer_diff)
@@ -139,7 +140,7 @@ void wj::PositionSystem::mod_ent_layer(uint64_t ent_instance_id, int layer_diff)
     pr->type = MOD_LAYER;
 
     std::lock_guard<std::mutex> lock(_lock);
-    _requests.push(pr);
+    _requests.push_back(pr);
 }
 
 void wj::PositionSystem::set_ent_layer(uint64_t ent_instance_id, uint8_t layer)
@@ -150,7 +151,7 @@ void wj::PositionSystem::set_ent_layer(uint64_t ent_instance_id, uint8_t layer)
     pr->type = SET_LAYER;
 
     std::lock_guard<std::mutex> lock(_lock);
-    _requests.push(pr);
+    _requests.push_back(pr);
 }
 
 wj::Vec2 wj::PositionSystem::get_position(uint64_t ent_instance_id)
@@ -160,7 +161,7 @@ wj::Vec2 wj::PositionSystem::get_position(uint64_t ent_instance_id)
     std::lock_guard<std::mutex> lock(_lock);
 
     // make sure the instance exists
-    if (!_instance_components.exists(ent_instance_id))
+    if (_instance_components.find(ent_instance_id) != _instance_components.end())
     {
         printf("Position Instance %llu does not exist.\n", ent_instance_id);
         assert(0);
@@ -178,7 +179,7 @@ uint8_t wj::PositionSystem::get_layer(uint64_t ent_instance_id)
     std::lock_guard<std::mutex> lock(_lock);
 
     // make sure the instance exists
-    if (!_instance_components.exists(ent_instance_id))
+    if (_instance_components.find(ent_instance_id) != _instance_components.end())
     {
         printf("Position Instance %llu does not exist.\n", ent_instance_id);
         assert(0);
@@ -195,7 +196,7 @@ double wj::PositionSystem::get_rotation(uint64_t ent_instance_id)
     std::lock_guard<std::mutex> lock(_lock);
 
     // make sure the instance exists
-    if (!_instance_components.exists(ent_instance_id))
+    if (_instance_components.find(ent_instance_id) != _instance_components.end())
     {
         printf("Position Instance %llu does not exist.\n", ent_instance_id);
         assert(0);
@@ -204,44 +205,6 @@ double wj::PositionSystem::get_rotation(uint64_t ent_instance_id)
     // get rotation
     rotation = _instance_components[ent_instance_id].rotation;
     return rotation;
-}
-
-std::string wj::PositionSystem::debug_define_to_string()
-{
-    std::string ret_str;
-
-    std::lock_guard<std::mutex> lock(_lock);
-    ret_str = _define_components.debug_to_string();
-
-    return ret_str;
-}
-
-std::string wj::PositionSystem::debug_instance_to_string()
-{
-    std::string ret_str;
-
-    std::lock_guard<std::mutex> lock(_lock);
-    ret_str = _instance_components.debug_to_string() + "\n";
-    for (auto p_comp : _instance_components)
-    {
-        ret_str += "Instance: " + std::to_string(p_comp.id) + "\n";
-        ret_str += "  [" + std::to_string(p_comp.position.x) + ", ";
-        ret_str += std::to_string(p_comp.position.y) + "]\n";
-        ret_str += "  Verts:\n";
-        for (auto vert : p_comp.collider)
-        {
-            ret_str += "    [" + std::to_string(vert.x) + ", ";
-            ret_str += std::to_string(vert.y) + "]\n";
-        }
-    }
-
-    return ret_str;
-}
-
-std::string wj::PositionSystem::debug_request_to_string()
-{
-    std::lock_guard<std::mutex> lock(_lock);
-    assert(0);
 }
 
 
@@ -253,9 +216,10 @@ void wj::PositionSystem::clear_instance_data()
     _instance_components.clear();
 
     // clear out requests
-    while (!_requests.is_empty())
+    while (_requests.size() > 0)
     {
-        PositionRequest *pr = _requests.pop();
+        PositionRequest *pr = _requests.front();
+        _requests.pop_front();
         delete pr;
     }
 }
